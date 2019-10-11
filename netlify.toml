@@ -1,4 +1,3 @@
 [build]
-  base    = "client"
-  command = "yarn export"
-  publish = "out"
+  command = "yarn --cwd client export"
+  publish = "client/out"

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Loading from "../components/loading";
+import Loading from "./loading";
 
 interface ConnectionContextProps {
   connection?: WebSocket;

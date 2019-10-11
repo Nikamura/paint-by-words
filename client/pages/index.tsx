@@ -1,5 +1,5 @@
 import { NextPage } from 'next';
-import GameClient from './game-client';
+import GameClient from '../components/game-client';
 import Layout from '../components/layout';
 
 const Home: NextPage<{ userAgent: string }> = ({ userAgent }) => (

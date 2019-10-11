@@ -1,6 +1,6 @@
 import React from "react";
 import dynamic from "next/dynamic"
-import GameBoard from "../components/game-board";
+import GameBoard from "./game-board";
 import { useConnection } from "./connection";
 
 const ConnectionProvider = dynamic(async () => (await import("./connection")).ConnectionProvider, { ssr: false})

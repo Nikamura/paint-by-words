@@ -1,15 +1,22 @@
 import React, {
   useState,
   MouseEventHandler,
-  useEffect,
   MouseEvent
 } from "react";
 
-type Color = Uint8ClampedArray | number[];
+import reverseUint32 from "./reverse-u32"
+
+type Color = Uint32Array | number;
+
+type PixelData = {
+  width: number;
+  height: number;
+  data: Uint32Array;
+}
 
 const GameBoard: React.FC = () => {
   const gameBoard = React.createRef<HTMLCanvasElement>();
-  const [color,  setColor] =  useState([123,123,123])
+  const [color,  setColor] =  useState(0x2F395DFF)
   const bb = () => gameBoard.current!.getBoundingClientRect();
   const getContext = () => gameBoard.current!.getContext("2d")!;
   const [mouseDown, setMouseDown] = useState(false);
@@ -27,7 +34,7 @@ const GameBoard: React.FC = () => {
       setMouseLoc([e.pageX, e.pageY]);
       const context = getContext();
       context.lineWidth = 1;
-      context.strokeStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+      context.strokeStyle = `#${color.toString(16)}`;
       context.lineJoin = context.lineCap = "round";
       context.lineTo(e.pageX - bb().left, e.pageY - bb().top);
       context.stroke();
@@ -39,27 +46,15 @@ const GameBoard: React.FC = () => {
     return [e.pageX - bb().left, e.pageY - bb().top];
   };
 
-  const getPixel = (imageData: ImageData, x: number, y: number): Color => {
-    if (x < 0 || y < 0 || x >= imageData.width || y >= imageData.height) {
-      return [-1, -1, -1, -1]; // impossible color
+  const getPixel = (pixelData: PixelData, x: number, y: number): Color => {
+    if (x < 0 || y < 0 || x >= pixelData.width || y >= pixelData.height) {
+      return -1;  // impossible color
     } else {
-      const offset = (y * imageData.width + x) * 4;
-      return imageData.data.slice(offset, offset + 4);
+      return pixelData.data[y * pixelData.width + x];
     }
   };
 
-  function setPixel(imageData: ImageData, x: number, y: number, color: Color) {
-    const offset = (y * imageData.width + x) * 4;
-    imageData.data[offset + 0] = color[0];
-    imageData.data[offset + 1] = color[1];
-    imageData.data[offset + 2] = color[2];
-    imageData.data[offset + 3] = 255;
-  }
-  function colorsMatch(a: any, b: any) {
-    return a[0] === b[0] && a[1] === b[1] && a[2] === b[2] && a[3] === b[3];
-  }
-
-  const floodFill = (x: number, y: number, fillColor: Color) => {
+  const floodFill = (x: number, y: number, fillColor: number) => {
     const ctx = getContext();
 
     const imageData = ctx.getImageData(
@@ -69,21 +64,33 @@ const GameBoard: React.FC = () => {
       ctx.canvas.height
     );
 
-    const targetColor = getPixel(imageData, x, y);
-    console.log("fillColor", fillColor)
+    const pixelData = {
+      width: imageData.width,
+      height: imageData.height,
+      data: new Uint32Array(imageData.data.buffer),
+    };
 
-    if (!colorsMatch(targetColor, fillColor)) {
+    const targetColor = getPixel(pixelData, x, y);
+
+    // console.log("targetColor", targetColor)
+    // console.log("fillColor", fillColor)
+    if (targetColor !== fillColor) {
       const queue = [[x, y]];
       while (queue.length > 0) {
-        // console.log(queue.length)
-        const [newX, newY] = queue.pop()!;
-        const newPixel = getPixel(imageData, newX, newY);
-        if (colorsMatch(targetColor, newPixel)) {
-          setPixel(imageData, newX, newY, fillColor);
-          if (newX + 1 < ctx.canvas.width) queue.push([newX + 1, newY]);
-          if (newX - 1 > 0) queue.push([newX - 1, y]);
-          if (newY + 1 < ctx.canvas.height) queue.push([newX, newY + 1]);
-          if (newY - 1 > 0) queue.push([newX, newY - 1]);
+        const [x, y] = queue.pop()!;
+        // console.log("[x, y]", x, y)
+        const currentCollor = getPixel(pixelData, x, y);
+        // console.log("currentCollor", currentCollor)
+        // console.log("targetColor", targetColor)
+        if (targetColor === currentCollor) {
+          const [r,g,b] = color.toString(16).match(/.{1,2}/g)!
+
+
+          pixelData.data[y * pixelData.width + x] = reverseUint32(fillColor);
+          queue.push([x + 1, y]);
+          queue.push([x - 1, y]);
+          queue.push([x, y + 1]);
+          queue.push([x, y - 1]);
         }
       }
       ctx.putImageData(imageData, 0, 0);
@@ -93,10 +100,15 @@ const GameBoard: React.FC = () => {
   const onClick: MouseEventHandler = e => {
     if (useFillBucket) {
       const [x, y] = getEventPosition(e);
-      floodFill(x, y, [...color, 1]);
+      // console.log("FILLING", color, color.toString(16).match(/.{1,3}/g), parseInt(color.toString(16), 16))
+      floodFill(x, y, color);
     }
   };
-  const colors = [[0,0,0],[0,0,128],[0,0,255],[0,128,0],[0,128,128],[0,255,0],[0,255,255],[128,0,0],[128,0,128],[128,128,0],[128,128,128],[192,192,192],[255,0,0],[255,0,255],[255,255,0],[255,255,255]]
+  const colors = [0x2F395DFF,
+    0x3A4D52FF,
+    0xE74025FF,
+    0xEB7A3EFF,
+    0xF4DA83FF]
   return (
     <div>
       <button
@@ -107,7 +119,7 @@ const GameBoard: React.FC = () => {
       </button>
       <br/>
       {colors.map((color, index) => (
-        <button key={index} style={{ backgroundColor: `rgb(${color[0]}, ${color[1]}, ${color[2]})` }} onClick={() => setColor(color)}>X</button>
+        <button key={index} style={{ backgroundColor: `#${color.toString(16)}` }} onClick={() => setColor(color)}>X</button>
       ))}
       <br/>
       <canvas

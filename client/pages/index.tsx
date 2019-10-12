@@ -1,17 +1,15 @@
-import { NextPage } from 'next';
+import React from "react"
 import GameClient from '../components/game-client';
 import Layout from '../components/layout';
 
-const Home: NextPage<{ userAgent: string }> = ({ userAgent }) => (
-    <Layout>
-        <GameClient/>
-        <h1>Hello world! - user agent: {userAgent}</h1>
-    </Layout>
+const Home = () => (
+<div>
+  Hello World
+  <Layout>
+      <GameClient/>
+  </Layout>
+</div>
 );
 
-Home.getInitialProps = async ({ req }) => {
-  const userAgent = req ? req.headers['user-agent'] || '' : navigator.userAgent;
-  return { userAgent };
-};
 
 export default Home;

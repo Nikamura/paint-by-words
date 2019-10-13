@@ -1,36 +1,44 @@
 import React, { useState, useEffect } from "react";
 import Loading from "./loading";
+import { Client } from "../lib/client";
 
 interface ConnectionContextProps {
-  connection?: WebSocket;
+  client: Client;
   connected: boolean;
 }
 
-const ConnectionContext  = React.createContext<ConnectionContextProps>({ connected: false });
+const ConnectionContext = React.createContext<ConnectionContextProps>({
+  connected: false,
+  client: new Client()
+});
 
 const ConnectionProvider: React.FC = props => {
   const [loading, setLoading] = useState(true);
-  const [connected, setConnected] = useState(true);
-
-  let connection: WebSocket | undefined;
+  const [connected, setConnected] = useState(false);
+  const [client, setClient] = useState(new Client());
 
   useEffect(() => {
     if (loading) {
-      connection = new WebSocket("ws://localhost:8080/");
-      connection.onopen = () =>  setConnected(false)
+      client.connect(() => {
+        setConnected(true);
+      });
+      setClient(client);
       setLoading(false);
     }
-  })
+  }, [client, loading]);
 
-  if (loading) return <Loading/>;
-  
-  return <ConnectionContext.Provider value={{ connection, connected }} {...props}/>
-}
+  if (loading) return <Loading />;
+
+  return (
+    <ConnectionContext.Provider value={{ client, connected }} {...props} />
+  );
+};
 
 function useConnection() {
   const context = React.useContext(ConnectionContext);
-  if (context === undefined) throw new Error("useConnection must be used within a ConnectionProvider");
+  if (context === undefined)
+    throw new Error("useConnection must be used within a ConnectionProvider");
   return context;
 }
 
-export { ConnectionProvider, useConnection }
+export { ConnectionProvider, useConnection };

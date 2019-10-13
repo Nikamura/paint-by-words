@@ -1,0 +1,7 @@
+{
+  "eslint.workingDirectories": [
+    "client",
+    "server"
+  ],
+  "editor.formatOnSave": true
+}

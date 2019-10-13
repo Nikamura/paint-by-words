@@ -1,10 +1,13 @@
 import React, {
   useState,
   MouseEventHandler,
-  MouseEvent
+  MouseEvent,
+  useEffect
 } from "react";
 
-import reverseUint32 from "./reverse-u32"
+import reverseUint32 from "./reverse-u32";
+import { throttle } from "../lib/throttle";
+import { useConnection } from "./connection";
 
 type Color = Uint32Array | number;
 
@@ -12,126 +15,227 @@ type PixelData = {
   width: number;
   height: number;
   data: Uint32Array;
-}
+};
 
 const GameBoard: React.FC = () => {
   const gameBoard = React.createRef<HTMLCanvasElement>();
-  const [color,  setColor] =  useState(0x2F395DFF)
-  const bb = () => gameBoard.current!.getBoundingClientRect();
-  const getContext = () => gameBoard.current!.getContext("2d")!;
-  const [mouseDown, setMouseDown] = useState(false);
-  const [mouseLoc, setMouseLoc] = useState([0, 0]);
-  console.log(mouseLoc);
+  const [color, setColor] = useState(0x2f395dff);
+  const [context, setContext] = useState<CanvasRenderingContext2D | null>();
+  // const getContext = () => gameBoard.current!.getContext("2d")!;
+  const [drawing, setDrawing] = useState(false);
+  const [currentX, setCurrentX] = useState(0);
+  const [currentY, setCurrentY] = useState(0);
+  const { client, connected } = useConnection();
+
   const onMouseDown: MouseEventHandler = e => {
-    getContext().beginPath();
-    if (!mouseDown) setMouseDown(true);
+    setDrawing(true);
+    const [x, y] = getEventPosition(e);
+    setCurrentX(x);
+    setCurrentY(y);
   };
 
-  const onMouseUp = () => setMouseDown(false);
-  const onMouseMove: MouseEventHandler = e => {
-    e.preventDefault();
-    if (mouseDown && !useFillBucket) {
-      setMouseLoc([e.pageX, e.pageY]);
-      const context = getContext();
-      context.lineWidth = 1;
-      context.strokeStyle = `#${color.toString(16)}`;
-      context.lineJoin = context.lineCap = "round";
-      context.lineTo(e.pageX - bb().left, e.pageY - bb().top);
-      context.stroke();
+  useEffect(() => {
+    if (gameBoard.current) setContext(gameBoard.current.getContext("2d"));
+  }, [gameBoard]);
+
+  const onMouseUp: MouseEventHandler = e => {
+    if (!drawing) return;
+    setDrawing(false);
+    const [x, y] = getEventPosition(e);
+
+    drawLine(currentX, currentY, x, y, color);
+  };
+
+  const selectColor = (color: number, emit = true) => {
+    setColor(color);
+
+    if (connected && emit) {
+      client.send("setColor", {
+        color
+      });
     }
   };
 
+  client.connection!.onmessage = event => {
+    if (!context) {
+      console.log("MISSING CONEXT");
+      return;
+    }
+    const w = context.canvas.width;
+    const h = context.canvas.height;
+    console.info("WebSocket message received22222:", event);
+    const parsedData = JSON.parse(event.data);
+    const data = parsedData.payload;
+    switch (parsedData.action) {
+      case "setColor":
+        selectColor(data.color, false);
+        break;
+      case "drawLine":
+        drawLine(
+          data.x0 * w,
+          data.y0 * h,
+          data.x1 * w,
+          data.y1 * h,
+          color,
+          false
+        );
+        break;
+      case "floodFill":
+        floodFill(data.x * w, data.y * h, color, false);
+        break;
+      default:
+        break;
+    }
+  };
+  // client.on("drawLine", (payload) => {
+  //   drawLine(payload.x0, payload.x1, payload.y0, payload.y1, color, false)
+  // })
+
+  const drawLine = (
+    x0: number,
+    y0: number,
+    x1: number,
+    y1: number,
+    color: number,
+    emit: boolean = true
+  ) => {
+    if (!context) {
+      console.log("no context drawLine");
+      return;
+    }
+    context.beginPath();
+    context.moveTo(x0, y0);
+    context.lineTo(x1, y1);
+    context.strokeStyle = `#${color.toString(16)}`;
+    context.lineWidth = 2;
+    context.stroke();
+    context.closePath();
+
+    if (connected && emit) {
+      const width = context.canvas.width;
+      const height = context.canvas.height;
+      client.send("drawLine", {
+        x0: x0 / width,
+        y0: y0 / height,
+        x1: x1 / width,
+        y1: y1 / height,
+        color: color
+      });
+    }
+  };
+
+  const onMouseMove: MouseEventHandler = e => {
+    if (!drawing) {
+      return;
+    }
+    const [x, y] = getEventPosition(e);
+    drawLine(currentX, currentY, x, y, color);
+    setCurrentX(x);
+    setCurrentY(y);
+  };
+
   const [useFillBucket, setUseFillBucket] = useState(false);
-  const getEventPosition = (e: MouseEvent) => {
-    return [e.pageX - bb().left, e.pageY - bb().top];
+
+  const getEventPosition = (e: MouseEvent): [number, number] => {
+    const { left, top } = gameBoard.current!.getBoundingClientRect();
+    return [e.pageX - left, e.pageY - top];
   };
 
   const getPixel = (pixelData: PixelData, x: number, y: number): Color => {
     if (x < 0 || y < 0 || x >= pixelData.width || y >= pixelData.height) {
-      return -1;  // impossible color
+      return -1; // impossible color
     } else {
       return pixelData.data[y * pixelData.width + x];
     }
   };
 
-  const floodFill = (x: number, y: number, fillColor: number) => {
-    const ctx = getContext();
+  const floodFill = (x: number, y: number, color: number, emit = true) => {
+    if (!context) {
+      console.log("no context floodFill");
+      return;
+    }
+    const fillColor = reverseUint32(color);
 
-    const imageData = ctx.getImageData(
+    const imageData = context.getImageData(
       0,
       0,
-      ctx.canvas.width,
-      ctx.canvas.height
+      context.canvas.width,
+      context.canvas.height
     );
 
     const pixelData = {
       width: imageData.width,
       height: imageData.height,
-      data: new Uint32Array(imageData.data.buffer),
+      data: new Uint32Array(imageData.data.buffer)
     };
 
     const targetColor = getPixel(pixelData, x, y);
 
-    // console.log("targetColor", targetColor)
-    // console.log("fillColor", fillColor)
     if (targetColor !== fillColor) {
       const queue = [[x, y]];
       while (queue.length > 0) {
         const [x, y] = queue.pop()!;
-        // console.log("[x, y]", x, y)
         const currentCollor = getPixel(pixelData, x, y);
-        // console.log("currentCollor", currentCollor)
-        // console.log("targetColor", targetColor)
         if (targetColor === currentCollor) {
-          const [r,g,b] = color.toString(16).match(/.{1,2}/g)!
-
-
-          pixelData.data[y * pixelData.width + x] = reverseUint32(fillColor);
+          pixelData.data[y * pixelData.width + x] = fillColor;
           queue.push([x + 1, y]);
           queue.push([x - 1, y]);
           queue.push([x, y + 1]);
           queue.push([x, y - 1]);
         }
       }
-      ctx.putImageData(imageData, 0, 0);
+      context.putImageData(imageData, 0, 0);
+    }
+
+    if (connected && emit) {
+      const width = context.canvas.width;
+      const height = context.canvas.height;
+      client.send("floodFill", {
+        x: x / width,
+        y: y / height,
+        color: color
+      });
     }
   };
 
   const onClick: MouseEventHandler = e => {
     if (useFillBucket) {
       const [x, y] = getEventPosition(e);
-      // console.log("FILLING", color, color.toString(16).match(/.{1,3}/g), parseInt(color.toString(16), 16))
       floodFill(x, y, color);
     }
   };
-  const colors = [0x2F395DFF,
-    0x3A4D52FF,
-    0xE74025FF,
-    0xEB7A3EFF,
-    0xF4DA83FF]
+  const colors = [0x2f395dff, 0x3a4d52ff, 0xe74025ff, 0xeb7a3eff, 0xf4da83ff];
   return (
     <div>
       <button
-        style={{ backgroundColor: useFillBucket ? "red" : "white" }}
+        style={{
+          backgroundColor: useFillBucket ? `#${color.toString(16)}` : "white"
+        }}
         onClick={() => setUseFillBucket(!useFillBucket)}
       >
         Fill bucket
       </button>
-      <br/>
+      <br />
       {colors.map((color, index) => (
-        <button key={index} style={{ backgroundColor: `#${color.toString(16)}` }} onClick={() => setColor(color)}>X</button>
+        <button
+          key={index}
+          style={{ backgroundColor: `#${color.toString(16)}` }}
+          onClick={() => selectColor(color)}
+        >
+          X
+        </button>
       ))}
-      <br/>
+      <br />
       <canvas
         ref={gameBoard}
         style={{ border: "1px solid cyan" }}
-        width={400}
+        width={1000}
         height={300}
         onClick={onClick}
         onMouseDown={onMouseDown}
         onMouseUp={onMouseUp}
         onMouseLeave={onMouseUp}
-        onMouseMove={onMouseMove}
+        onMouseMove={throttle(onMouseMove, 10)}
       />
     </div>
   );

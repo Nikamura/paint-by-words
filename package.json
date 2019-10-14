@@ -3,6 +3,6 @@
   "workspaces": [
     "client",
     "server",
-    "core"
+    "protobuf"
   ]
 }

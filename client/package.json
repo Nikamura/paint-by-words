@@ -30,11 +30,13 @@
     "eslint-plugin-react-hooks": "^2.1.2",
     "next": "^9.1.1",
     "prettier": "^1.18.2",
+    "protobufjs": "^6.8.8",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
-    "typescript": "^3.6.4"
+    "typescript": "^3.6.4",
+    "@pbn/messages": "*"
   },
   "eslintConfig": {
     "extends": "react-app"

@@ -1,0 +1,30 @@
+syntax = "proto3";
+package paint_by_words;
+
+message CommandMessage {
+  enum Command {
+    UNDEFINED = 0;
+    DRAW_LINE = 1;
+  }
+  Command command = 1;
+  bytes payload = 2;
+}
+
+message DrawLine {
+  float x0 = 1;
+  float y0 = 2;
+  float x1 = 3;
+  float y1 = 4;
+}
+
+message Player {
+  string id = 1;
+  string name = 2;
+}
+
+message RoomType {
+  int32 id = 1;
+  string name = 2;
+
+  repeated int32 color = 3;
+}

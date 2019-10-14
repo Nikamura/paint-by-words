@@ -13,7 +13,7 @@
     "typescript": "^3.7.0-beta"
   },
   "dependencies": {
-    "core": "1.0.0",
-    "ws": "^7.1.2"
+    "ws": "^7.1.2",
+    "@pbn/messages": "*"
   }
 }

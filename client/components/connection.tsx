@@ -19,9 +19,7 @@ const ConnectionProvider: React.FC = props => {
 
   useEffect(() => {
     if (loading) {
-      client.connect(() => {
-        setConnected(true);
-      });
+      client.connect(() => setConnected(true));
       setClient(client);
       setLoading(false);
     }

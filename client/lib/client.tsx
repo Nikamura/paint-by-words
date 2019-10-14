@@ -15,6 +15,8 @@ export class Client {
 
   public connect(onConnect?: (ev: Event) => void): void {
     const connection = new WebSocket("ws://localhost:8080/");
+    connection.binaryType = "arraybuffer"
+    if (onConnect) connection.onopen = onConnect;
     connection.onmessage = event => {
       console.info("WebSocket message received:", event);
       const { data } = event;

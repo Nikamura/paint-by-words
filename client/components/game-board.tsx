@@ -8,7 +8,9 @@ import React, {
 import reverseUint32 from "./reverse-u32";
 import { throttle } from "../lib/throttle";
 import { useConnection } from "./connection";
-
+import CurrentUser from "./current-user";
+import Register from "./register";
+import { DrawLine, CommandMessage, Player } from "@pbn/messages";
 type Color = Uint32Array | number;
 
 type PixelData = {
@@ -26,6 +28,7 @@ const GameBoard: React.FC = () => {
   const [currentX, setCurrentX] = useState(0);
   const [currentY, setCurrentY] = useState(0);
   const { client, connected } = useConnection();
+  const [user, setUser] = useState<Player | undefined>();
 
   const onMouseDown: MouseEventHandler = e => {
     setDrawing(true);
@@ -43,7 +46,7 @@ const GameBoard: React.FC = () => {
     setDrawing(false);
     const [x, y] = getEventPosition(e);
 
-    drawLine(currentX, currentY, x, y, color);
+    drawLine(currentX, currentY, x, y);
   };
 
   const selectColor = (color: number, emit = true) => {
@@ -61,31 +64,61 @@ const GameBoard: React.FC = () => {
       console.log("MISSING CONEXT");
       return;
     }
+    // console.info("WebSocket message received22222:", event);
+    // console.log("DATA", event.data)
     const w = context.canvas.width;
     const h = context.canvas.height;
-    console.info("WebSocket message received22222:", event);
-    const parsedData = JSON.parse(event.data);
-    const data = parsedData.payload;
-    switch (parsedData.action) {
-      case "setColor":
-        selectColor(data.color, false);
-        break;
-      case "drawLine":
+    const commandMessage = CommandMessage.deserializeBinary(
+      new Uint8Array(event.data)
+    );
+    switch (commandMessage.getCommand()) {
+      case 1:
+        const drawLineMsg = DrawLine.deserializeBinary(
+          commandMessage.getPayload_asU8()
+        ).toObject();
         drawLine(
-          data.x0 * w,
-          data.y0 * h,
-          data.x1 * w,
-          data.y1 * h,
-          color,
+          drawLineMsg.x0 * w,
+          drawLineMsg.y0 * h,
+          drawLineMsg.x1 * w,
+          drawLineMsg.y1 * h,
           false
         );
         break;
-      case "floodFill":
-        floodFill(data.x * w, data.y * h, color, false);
-        break;
+
       default:
         break;
     }
+    // console.log("command", commandMessage.getCommand())
+    // console.log("payload", commandMessage.getPayload())
+    return;
+    // const w = context.canvas.width;
+    // const h = context.canvas.height;
+    // console.log(event.data.buffer, typeof event.data.buffer)
+    // const parsedData = JSON.parse(event.data);
+    // const data = parsedData.payload;
+    // switch (parsedData.action) {
+    //   case "setColor":
+    //     selectColor(data.color, false);
+    //     break;
+    //   case "drawLine":
+    // drawLine(
+    //   data.x0 * w,
+    //   data.y0 * h,
+    //   data.x1 * w,
+    //   data.y1 * h,
+    //   color,
+    //   false
+    // );
+    //     break;
+    //   case "floodFill":
+    //     floodFill(data.x * w, data.y * h, color, false);
+    //     break;
+    //   case "yourDetails":
+    //     setUser(new Player(data.payload));
+    //     break;
+    //   default:
+    //     break;
+    // }
   };
   // client.on("drawLine", (payload) => {
   //   drawLine(payload.x0, payload.x1, payload.y0, payload.y1, color, false)
@@ -96,7 +129,6 @@ const GameBoard: React.FC = () => {
     y0: number,
     x1: number,
     y1: number,
-    color: number,
     emit: boolean = true
   ) => {
     if (!context) {
@@ -114,13 +146,18 @@ const GameBoard: React.FC = () => {
     if (connected && emit) {
       const width = context.canvas.width;
       const height = context.canvas.height;
-      client.send("drawLine", {
-        x0: x0 / width,
-        y0: y0 / height,
-        x1: x1 / width,
-        y1: y1 / height,
-        color: color
-      });
+      const drawLine = new DrawLine();
+
+      drawLine.setX0(x0 / width);
+      drawLine.setY0(y0 / height);
+      drawLine.setX1(x1 / width);
+      drawLine.setY1(y1 / height);
+
+      const commandMessage = new CommandMessage();
+      commandMessage.setCommand(1);
+      commandMessage.setPayload(drawLine.serializeBinary());
+      client.connection &&
+        client.connection.send(commandMessage.serializeBinary());
     }
   };
 
@@ -129,7 +166,7 @@ const GameBoard: React.FC = () => {
       return;
     }
     const [x, y] = getEventPosition(e);
-    drawLine(currentX, currentY, x, y, color);
+    drawLine(currentX, currentY, x, y);
     setCurrentX(x);
     setCurrentY(y);
   };
@@ -207,6 +244,8 @@ const GameBoard: React.FC = () => {
   const colors = [0x2f395dff, 0x3a4d52ff, 0xe74025ff, 0xeb7a3eff, 0xf4da83ff];
   return (
     <div>
+      {user ? <CurrentUser user={user} /> : <Register />}
+      <div>Connected: {connected ? "Connected" : "Offline"}</div>
       <button
         style={{
           backgroundColor: useFillBucket ? `#${color.toString(16)}` : "white"
@@ -229,7 +268,7 @@ const GameBoard: React.FC = () => {
       <canvas
         ref={gameBoard}
         style={{ border: "1px solid cyan" }}
-        width={1000}
+        width={400}
         height={300}
         onClick={onClick}
         onMouseDown={onMouseDown}

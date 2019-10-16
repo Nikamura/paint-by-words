@@ -1,8 +1,17 @@
 {
+  "name": "paint-by-words",
   "private": true,
   "workspaces": [
     "client",
     "server",
     "protobuf"
-  ]
+  ],
+  "scripts": {
+    "dev": "lerna run dev --stream",
+    "build": "lerna run build",
+    "bootstrap": "lerna bootstrap --use-workspaces"
+  },
+  "devDependencies": {
+    "lerna": "^3.18.1"
+  }
 }

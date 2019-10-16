@@ -4,7 +4,6 @@ import Layout from '../components/layout';
 
 const Home = () => (
 <div>
-  Hello World
   <Layout>
       <GameClient/>
   </Layout>

@@ -3,41 +3,9 @@
 
 import * as jspb from "google-protobuf";
 
-export class DrawLine extends jspb.Message {
-  getX0(): number;
-  setX0(value: number): void;
-
-  getY0(): number;
-  setY0(value: number): void;
-
-  getX1(): number;
-  setX1(value: number): void;
-
-  getY1(): number;
-  setY1(value: number): void;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): DrawLine.AsObject;
-  static toObject(includeInstance: boolean, msg: DrawLine): DrawLine.AsObject;
-  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-  static serializeBinaryToWriter(message: DrawLine, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): DrawLine;
-  static deserializeBinaryFromReader(message: DrawLine, reader: jspb.BinaryReader): DrawLine;
-}
-
-export namespace DrawLine {
-  export type AsObject = {
-    x0: number,
-    y0: number,
-    x1: number,
-    y1: number,
-  }
-}
-
-export class CommandMessage extends jspb.Message {
-  getCommand(): CommandMessage.CommandMap[keyof CommandMessage.CommandMap];
-  setCommand(value: CommandMessage.CommandMap[keyof CommandMessage.CommandMap]): void;
+export class Message extends jspb.Message {
+  getMessagetype(): Message.MessageTypeMap[keyof Message.MessageTypeMap];
+  setMessagetype(value: Message.MessageTypeMap[keyof Message.MessageTypeMap]): void;
 
   getPayload(): Uint8Array | string;
   getPayload_asU8(): Uint8Array;
@@ -45,27 +13,28 @@ export class CommandMessage extends jspb.Message {
   setPayload(value: Uint8Array | string): void;
 
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): CommandMessage.AsObject;
-  static toObject(includeInstance: boolean, msg: CommandMessage): CommandMessage.AsObject;
+  toObject(includeInstance?: boolean): Message.AsObject;
+  static toObject(includeInstance: boolean, msg: Message): Message.AsObject;
   static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
   static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-  static serializeBinaryToWriter(message: CommandMessage, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): CommandMessage;
-  static deserializeBinaryFromReader(message: CommandMessage, reader: jspb.BinaryReader): CommandMessage;
+  static serializeBinaryToWriter(message: Message, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Message;
+  static deserializeBinaryFromReader(message: Message, reader: jspb.BinaryReader): Message;
 }
 
-export namespace CommandMessage {
+export namespace Message {
   export type AsObject = {
-    command: CommandMessage.CommandMap[keyof CommandMessage.CommandMap],
+    messagetype: Message.MessageTypeMap[keyof Message.MessageTypeMap],
     payload: Uint8Array | string,
   }
 
-  export interface CommandMap {
+  export interface MessageTypeMap {
     UNDEFINED: 0;
     DRAW_LINE: 1;
+    FLOOD_FILL: 2;
   }
 
-  export const Command: CommandMap;
+  export const MessageType: MessageTypeMap;
 }
 
 export class Player extends jspb.Message {
@@ -119,6 +88,62 @@ export namespace RoomType {
     id: number,
     name: string,
     colorList: Array<number>,
+  }
+}
+
+export class DrawLine extends jspb.Message {
+  getX0(): number;
+  setX0(value: number): void;
+
+  getY0(): number;
+  setY0(value: number): void;
+
+  getX1(): number;
+  setX1(value: number): void;
+
+  getY1(): number;
+  setY1(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): DrawLine.AsObject;
+  static toObject(includeInstance: boolean, msg: DrawLine): DrawLine.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: DrawLine, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): DrawLine;
+  static deserializeBinaryFromReader(message: DrawLine, reader: jspb.BinaryReader): DrawLine;
+}
+
+export namespace DrawLine {
+  export type AsObject = {
+    x0: number,
+    y0: number,
+    x1: number,
+    y1: number,
+  }
+}
+
+export class FloodFill extends jspb.Message {
+  getX(): number;
+  setX(value: number): void;
+
+  getY(): number;
+  setY(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): FloodFill.AsObject;
+  static toObject(includeInstance: boolean, msg: FloodFill): FloodFill.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: FloodFill, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): FloodFill;
+  static deserializeBinaryFromReader(message: FloodFill, reader: jspb.BinaryReader): FloodFill;
+}
+
+export namespace FloodFill {
+  export type AsObject = {
+    x: number,
+    y: number,
   }
 }
 

@@ -10,7 +10,7 @@ import { throttle } from "../lib/throttle";
 import { useConnection } from "./connection";
 import CurrentUser from "./current-user";
 import Register from "./register";
-import { DrawLine, CommandMessage, Player } from "@pbn/messages";
+import { DrawLine, Message, Player, FloodFill } from "@pbn/messages";
 type Color = Uint32Array | number;
 
 type PixelData = {
@@ -60,30 +60,39 @@ const GameBoard: React.FC = () => {
   };
 
   client.connection!.onmessage = event => {
+    console.log("WS", event)
     if (!context) {
       console.log("MISSING CONEXT");
       return;
     }
     // console.info("WebSocket message received22222:", event);
     // console.log("DATA", event.data)
-    const w = context.canvas.width;
-    const h = context.canvas.height;
-    const commandMessage = CommandMessage.deserializeBinary(
+    const message = Message.deserializeBinary(
       new Uint8Array(event.data)
     );
-    switch (commandMessage.getCommand()) {
+    switch (message.getMessagetype()) {
       case 1:
         const drawLineMsg = DrawLine.deserializeBinary(
-          commandMessage.getPayload_asU8()
+          message.getPayload_asU8()
         ).toObject();
         drawLine(
-          drawLineMsg.x0 * w,
-          drawLineMsg.y0 * h,
-          drawLineMsg.x1 * w,
-          drawLineMsg.y1 * h,
+          drawLineMsg.x0,
+          drawLineMsg.y0,
+          drawLineMsg.x1,
+          drawLineMsg.y1,
           false
         );
         break;
+      case 2:
+          const floodFilllMsg = FloodFill.deserializeBinary(
+            message.getPayload_asU8()
+          ).toObject();
+          floodFill(
+            floodFilllMsg.x,
+            floodFilllMsg.y,
+            false
+          );
+          break;
 
       default:
         break;
@@ -144,20 +153,18 @@ const GameBoard: React.FC = () => {
     context.closePath();
 
     if (connected && emit) {
-      const width = context.canvas.width;
-      const height = context.canvas.height;
       const drawLine = new DrawLine();
+      console.log({ x0, y0, x1, y1 })
+      drawLine.setX0(x0);
+      drawLine.setY0(y0);
+      drawLine.setX1(x1);
+      drawLine.setY1(y1);
 
-      drawLine.setX0(x0 / width);
-      drawLine.setY0(y0 / height);
-      drawLine.setX1(x1 / width);
-      drawLine.setY1(y1 / height);
-
-      const commandMessage = new CommandMessage();
-      commandMessage.setCommand(1);
-      commandMessage.setPayload(drawLine.serializeBinary());
+      const message = new Message();
+      message.setMessagetype(1);
+      message.setPayload(drawLine.serializeBinary());
       client.connection &&
-        client.connection.send(commandMessage.serializeBinary());
+        client.connection.send(message.serializeBinary());
     }
   };
 
@@ -186,7 +193,8 @@ const GameBoard: React.FC = () => {
     }
   };
 
-  const floodFill = (x: number, y: number, color: number, emit = true) => {
+  const floodFill = (x: number, y: number, emit = true) => {
+    console.log("#floodFill")
     if (!context) {
       console.log("no context floodFill");
       return;
@@ -207,7 +215,7 @@ const GameBoard: React.FC = () => {
     };
 
     const targetColor = getPixel(pixelData, x, y);
-
+    console.log({ targetColor, fillColor })
     if (targetColor !== fillColor) {
       const queue = [[x, y]];
       while (queue.length > 0) {
@@ -225,20 +233,21 @@ const GameBoard: React.FC = () => {
     }
 
     if (connected && emit) {
-      const width = context.canvas.width;
-      const height = context.canvas.height;
-      client.send("floodFill", {
-        x: x / width,
-        y: y / height,
-        color: color
-      });
+      const floodFill = new FloodFill();
+      floodFill.setX(x);
+      floodFill.setY(y);
+      const message = new Message();
+      message.setMessagetype(2);
+      message.setPayload(floodFill.serializeBinary());
+      client.connection &&
+        client.connection.send(message.serializeBinary());
     }
   };
 
   const onClick: MouseEventHandler = e => {
     if (useFillBucket) {
       const [x, y] = getEventPosition(e);
-      floodFill(x, y, color);
+      floodFill(x, y);
     }
   };
   const colors = [0x2f395dff, 0x3a4d52ff, 0xe74025ff, 0xeb7a3eff, 0xf4da83ff];

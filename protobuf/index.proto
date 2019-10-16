@@ -1,20 +1,14 @@
 syntax = "proto3";
 package paint_by_words;
 
-message CommandMessage {
-  enum Command {
+message Message {
+  enum MessageType {
     UNDEFINED = 0;
     DRAW_LINE = 1;
+    FLOOD_FILL = 2;
   }
-  Command command = 1;
+  MessageType messageType = 1;
   bytes payload = 2;
-}
-
-message DrawLine {
-  float x0 = 1;
-  float y0 = 2;
-  float x1 = 3;
-  float y1 = 4;
 }
 
 message Player {
@@ -28,3 +22,23 @@ message RoomType {
 
   repeated int32 color = 3;
 }
+
+
+// Commands
+message DrawLine {
+  float x0 = 1;
+  float y0 = 2;
+  float x1 = 3;
+  float y1 = 4;
+}
+
+message FloodFill {
+  float x = 1;
+  float y = 2;
+}
+
+// {
+//   x: x / width,
+//   y: y / height,
+//   color: color
+// }

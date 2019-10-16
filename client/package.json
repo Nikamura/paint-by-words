@@ -12,12 +12,13 @@
     "lint": "yarn eslint pages components --ext .ts,.tsx,.js,.jsx"
   },
   "dependencies": {
-    "@types/node": "^12.7.12",
-    "@types/react": "^16.9.5",
+    "@pbn/messages": "*",
+    "@types/node": "^12.11.1",
+    "@types/react": "^16.9.9",
     "@types/socket.io": "^2.1.4",
     "@types/socket.io-client": "^1.4.32",
-    "@typescript-eslint/eslint-plugin": "^2.3.3",
-    "@typescript-eslint/parser": "^2.3.3",
+    "@typescript-eslint/eslint-plugin": "^2.4.0",
+    "@typescript-eslint/parser": "^2.4.0",
     "babel-eslint": "^10.0.3",
     "eslint": "^6.5.1",
     "eslint-config-prettier": "^6.2.0",
@@ -35,8 +36,7 @@
     "react-dom": "^16.10.2",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
-    "typescript": "^3.6.4",
-    "@pbn/messages": "*"
+    "typescript": "^3.6.4"
   },
   "eslintConfig": {
     "extends": "react-app"

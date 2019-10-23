@@ -11,6 +11,7 @@ wss.on("connection", function connection(ws) {
   // });
 
   ws.on("message", function incoming(data) {
+    console.log("INC", data)
     if (!(data instanceof Buffer)) return;
 
     const message = Message.deserializeBinary(data);

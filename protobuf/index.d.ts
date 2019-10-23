@@ -32,6 +32,7 @@ export namespace Message {
     UNDEFINED: 0;
     DRAW_LINE: 1;
     FLOOD_FILL: 2;
+    REGISTER: 3;
   }
 
   export const MessageType: MessageTypeMap;
@@ -144,6 +145,26 @@ export namespace FloodFill {
   export type AsObject = {
     x: number,
     y: number,
+  }
+}
+
+export class Register extends jspb.Message {
+  getName(): string;
+  setName(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): Register.AsObject;
+  static toObject(includeInstance: boolean, msg: Register): Register.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: Register, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Register;
+  static deserializeBinaryFromReader(message: Register, reader: jspb.BinaryReader): Register;
+}
+
+export namespace Register {
+  export type AsObject = {
+    name: string,
   }
 }
 

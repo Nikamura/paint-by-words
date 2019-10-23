@@ -1,9 +1,12 @@
 {
   "compilerOptions": {
+    "target": "es5",
     "baseUrl": "./src",
     "paths": {
       "~*": ["./*"]
-    }
+    },
+    "lib": ["dom"],
+    "typeRoots": ["./node_modules/@types", "./src"]
   },
   "include": ["src/**/*"]
 }

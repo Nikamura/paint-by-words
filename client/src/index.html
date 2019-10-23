@@ -2,10 +2,13 @@
   <head></head>
   <body>
     <template id="login-template">
-      <div>
-        Welcome, <input placeholder="Enter your name" />!
-        <button style="display: block;">Join</button>
-      </div>
+      <form>
+          Welcome, <input placeholder="Enter your name" name="name" />!
+          <input type="submit">Join</input>
+      </form>
+    </template>
+    <template id="game-board">
+      <canvas width="600" height="400" style="border: 1px solid red;"></canvas>
     </template>
     <div id="app"></div>
     <script src="./index.ts"></script>

@@ -1,13 +1,19 @@
-import Client from "~client";
+import { App } from "~app";
 
-const client = new Client("ws://localhost:8080");
-client.connect().then(() => {console.log("connected")});
+function getServerUrl(): string {
+  const serverUrl = process.env.PAINT_BY_WORDS_SERVER_URL;
+  if (!serverUrl) {
+    if (process.env.NODE_ENV === "development") {
+      return "ws://localhost:8080";
+    }
+    throw new Error("Missing server URL!");
+  }
+}
 
-const app = document.getElementById("app");
-const loginTemplate = document.getElementById("login-template") as HTMLTemplateElement;
-const fetchingNode = document.importNode(loginTemplate.content, true);
-const username = fetchingNode.querySelector("input");
-fetchingNode.querySelector("button").addEventListener("click", () => {
-    console.log("Logging in as", username.value)
-})
-app.replaceWith(fetchingNode);
+(() => {
+  const serverUrl = getServerUrl();
+  const painByWords = new App(serverUrl);
+  global.painByWords = painByWords;
+  global.serverUrl = serverUrl;
+  painByWords.renderLogin();
+})();

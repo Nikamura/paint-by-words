@@ -1,57 +1,62 @@
 import { throttle } from "~throttle";
 import { EventEmitter } from "events";
-// declare interface MyClass {
-// on(event: 'hello', listener: (name: string) => void): this;
-// on(event: string, listener: Function): this;
-// }
 
-// class MyClass extends events.EventEmitter {
-//     emitHello(name: string): void {
-//         this.emit('hello', name);
-//     }
-// }
-// this.emit("drawLine", { x0, y0, x1, y1 });
 export interface GameBoard {
   on(
     event: "drawLine",
     listener: (ev: { x0: number; y0: number; x1: number; y1: number }) => void
   ): this;
-  //   on(event: string, listener: Function): this;
+
+  drawLine(
+    x0: number,
+    y0: number,
+    x1: number,
+    y1: number,
+    emit?: boolean
+  ): void;
 }
 
-export class GameBoard extends EventEmitter {
-  public color = "orange";
-  public drawing = false;
-  public currentX = 0;
-  public currentY = 0;
-  public context: CanvasRenderingContext2D;
+export type PixelData = {
+  width: number;
+  height: number;
+  data: Uint32Array;
+};
 
-  constructor(private el: HTMLCanvasElement) {
+export class GameBoard extends EventEmitter {
+  private color = "red";
+  private drawing = false;
+  private lineWidth = 1;
+  private currentX = 0;
+  private currentY = 0;
+  private context: CanvasRenderingContext2D;
+
+  constructor(private canvas: HTMLCanvasElement) {
     super();
-    const ctx = el.getContext("2d");
-    if (!ctx) throw new Error("missing 2d context");
-    this.context = ctx;
-    super();
+    this.context = this.canvas.getContext("2d");
   }
 
-  setupMouse() {
-    this.el.addEventListener("mousedown", event => {
+  render() {
+    this.setupMouse();
+  }
+
+  private setupMouse() {
+    this.canvas.addEventListener("mousedown", event => {
       this.drawing = true;
       const [x, y] = this.getEventPosition(event);
       this.currentX = x;
       this.currentY = y;
     });
 
-    this.el.addEventListener("mouseup", event => {
+    this.canvas.addEventListener("mouseup", event => {
       if (!this.drawing) return;
       this.drawing = false;
       const [x, y] = this.getEventPosition(event);
       this.drawLine(this.currentX, this.currentY, x, y);
     });
 
-    this.el.addEventListener(
+    this.canvas.addEventListener(
       "mousemove",
-      throttle(event => {
+      throttle((event: MouseEvent) => {
         if (!this.drawing) return;
         const [x, y] = this.getEventPosition(event);
         this.drawLine(this.currentX, this.currentY, x, y);
@@ -61,33 +66,29 @@ export class GameBoard extends EventEmitter {
     );
   }
 
-  render() {
-    this.setupMouse();
-    const ctx = this.context;
-    ctx.beginPath();
-    ctx.rect(20, 20, 150, 100);
-    ctx.fillStyle = "red";
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.rect(40, 40, 150, 100);
-    ctx.fillStyle = "blue";
-    ctx.fill();
-  }
-
-  drawLine(x0: number, y0: number, x1: number, y1: number) {
+  public drawLine(x0: number, y0: number, x1: number, y1: number, emit = true) {
     this.context.beginPath();
     this.context.moveTo(x0, y0);
     this.context.lineTo(x1, y1);
     this.context.strokeStyle = this.color;
-    this.context.lineWidth = 1;
+    this.context.lineWidth = this.lineWidth;
     this.context.stroke();
     this.context.closePath();
-    this.emit("drawLine", { x0, y0, x1, y1 });
+    if (emit) this.emit("drawLine", { x0, y0, x1, y1 });
   }
 
-  getEventPosition(e: MouseEvent): [number, number] {
-    const { left, top } = this.el.getBoundingClientRect();
+  public setColor(color: string, emit = true) {
+    this.color = color;
+    if (emit) this.emit("setColor", color);
+  }
+
+  public setLineWidth(lineWidth: number, emit = true) {
+    this.lineWidth = lineWidth;
+    if (emit) this.emit("setLineWidth", lineWidth);
+  }
+
+  private getEventPosition(e: MouseEvent): [number, number] {
+    const { left, top } = this.canvas.getBoundingClientRect();
     return [e.pageX - left, e.pageY - top];
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "server",
+  "name": "@pbn/server",
   "version": "1.0.0",
   "main": "dist/index.js",
   "license": "MIT",
@@ -9,10 +9,12 @@
   },
   "devDependencies": {
     "@types/ws": "^6.0.3",
+    "lerna": "^3.18.3",
     "tsc-watch": "^4.0.0",
-    "typescript": "^3.7.0-beta"
+    "typescript": "^3.7.1-rc"
   },
   "dependencies": {
+    "@pbn/core": "*",
     "@pbn/messages": "*",
     "ws": "^7.1.2"
   }

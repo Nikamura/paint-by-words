@@ -1,5 +1,5 @@
 {
-  "packages": ["client", "protobuf", "server"],
+  "packages": ["client", "protobuf", "server", "core"],
   "npmClient": "yarn",
   "useWorkspaces": true,
   "version": "independent"

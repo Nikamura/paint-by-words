@@ -1,27 +1,23 @@
-import { Message } from "@pbn/messages";
-// if (!(data instanceof Buffer)) return;
-// console.log("Incoming message", event);
-//     if (!context) return;
+import { Message, DrawLine, Register, FloodFill } from "@pbn/messages";
 
-//     const message = Message.deserializeBinary(new Uint8Array(event.data));
-//     switch (message.getMessagetype()) {
-//       case 1:
-//         const drawLineMsg = DrawLine.deserializeBinary(
-//           message.getPayload_asU8()
-//         ).toObject();
-//         drawLine(
-//           drawLineMsg.x0,
-//           drawLineMsg.y0,
-//           drawLineMsg.x1,
-//           drawLineMsg.y1,
-//           false
-//         );
-//         break;
-//       default:
-//         console.log("Unidentified message", message.getMessagetype());
-//         break;
-//     }
+export type Constructable<T> = new (...args: any[]) => T;
 
-function getMessage(data: Buffer) {
+type MessageType = DrawLine | Register | FloodFill;
+
+const messageMap = new Map<
+  Message.MessageTypeMap[keyof Message.MessageTypeMap],
+  Constructable<MessageType>
+>([[1, DrawLine], [2, FloodFill], [3, Register]]);
+
+export function getMessage(data: Buffer): MessageType | void {
   const message = Message.deserializeBinary(new Uint8Array(data));
+
+  const messageType = message.getMessagetype();
+  const messageClass = messageMap.get(messageType);
+  if (!messageClass) {
+    console.error("Unidentified message received", messageType);
+    return;
+  }
+
+  return (<any>messageClass).deserializeBinary(message.getPayload_asU8());
 }

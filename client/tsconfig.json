@@ -5,7 +5,7 @@
     "paths": {
       "~*": ["./*"]
     },
-    "lib": ["dom"],
+    "lib": ["dom", "esnext"],
     "typeRoots": ["./node_modules/@types", "./src"]
   },
   "include": ["src/**/*"]

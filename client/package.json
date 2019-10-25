@@ -1,5 +1,5 @@
 {
-  "name": "client",
+  "name": "@pbn/client",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
@@ -8,11 +8,13 @@
     "build": "parcel build src/index.html"
   },
   "dependencies": {
-    "@pbn/messages": "*"
+    "@pbn/messages": "*",
+    "@pbn/core": "*"
   },
   "devDependencies": {
+    "@types/node": "^12.11.7",
     "parcel-bundler": "^1.12.4",
-    "typescript": "^3.7.0-beta"
+    "typescript": "^3.7.1-rc"
   },
   "browserslist": [
     "> 1%",

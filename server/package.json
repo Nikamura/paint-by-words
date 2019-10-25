@@ -1,6 +1,6 @@
 {
   "name": "@pbw/server",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
@@ -14,8 +14,8 @@
     "typescript": "^3.7.1-rc"
   },
   "dependencies": {
-    "@pbw/core": "*",
-    "@pbw/messages": "*",
+    "@pbw/core": "^1.0.1",
+    "@pbw/messages": "^1.0.1",
     "ws": "^7.1.2"
   },
   "publishConfig": {

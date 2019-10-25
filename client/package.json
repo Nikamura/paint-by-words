@@ -1,6 +1,6 @@
 {
   "name": "@pbw/client",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
@@ -8,8 +8,8 @@
     "build": "parcel build src/index.html"
   },
   "dependencies": {
-    "@pbw/messages": "*",
-    "@pbw/core": "*"
+    "@pbw/core": "^1.0.1",
+    "@pbw/messages": "^1.0.1"
   },
   "devDependencies": {
     "@types/node": "^12.11.7",

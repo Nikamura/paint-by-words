@@ -1,6 +1,6 @@
 {
   "name": "paint-by-words",
-  "private": true,
+  "private": false,
   "workspaces": [
     "client",
     "core",

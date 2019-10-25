@@ -2,5 +2,8 @@
   "version": "0.0.1",
   "packages": ["client", "protobuf", "server", "core"],
   "npmClient": "yarn",
-  "useWorkspaces": true
+  "useWorkspaces": true,
+  "publishConfig": {
+    "access": "public"
+  }
 }

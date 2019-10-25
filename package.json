@@ -10,7 +10,8 @@
   "scripts": {
     "dev": "lerna run dev --stream",
     "build": "lerna run build",
-    "bootstrap": "lerna bootstrap --use-workspaces"
+    "bootstrap": "lerna bootstrap --use-workspaces",
+    "publish": "lerna publish"
   },
   "devDependencies": {
     "lerna": "^3.18.1"

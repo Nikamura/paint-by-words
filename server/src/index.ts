@@ -1,5 +1,5 @@
 import WebSocket from "ws";
-import { getMessage } from "@pbn/core";
+import { getMessage } from "@pbw/core";
 
 const wss = new WebSocket.Server({ port: 8080 });
 

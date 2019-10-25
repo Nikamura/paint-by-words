@@ -1,10 +1,10 @@
 {
-  "name": "@pbn/core",
+  "name": "@pbw/core",
   "version": "1.0.0",
   "main": "dist/index.js",
   "license": "MIT",
   "dependencies": {
-    "@pbn/messages": "1.0.0"
+    "@pbw/messages": "1.0.0"
   },
   "devDependencies": {
     "typescript": "^3.7.1-rc"

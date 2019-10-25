@@ -1,4 +1,4 @@
-import { Message, DrawLine, Register, FloodFill } from "@pbn/messages";
+import { Message, DrawLine, Register, FloodFill } from "@pbw/messages";
 
 export type Constructable<T> = new (...args: any[]) => T;
 

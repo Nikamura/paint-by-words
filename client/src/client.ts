@@ -1,4 +1,4 @@
-import { Register, Message, DrawLine } from "@pbn/messages";
+import { Register, Message, DrawLine } from "@pbw/messages";
 
 export default class Client {
   private serverUrl: string;

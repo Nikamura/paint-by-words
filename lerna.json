@@ -1,10 +1,6 @@
 {
-  "version": "1.0.0",
+  "version": "0.0.1",
   "packages": ["client", "protobuf", "server", "core"],
   "npmClient": "yarn",
-  "useWorkspaces": true,
-  "publish": {
-    "ignoreChanges": ["ignored-file", "*.md"],
-    "registry": "https://npm.pkg.github.com"
-  }
+  "useWorkspaces": true
 }

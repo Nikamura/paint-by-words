@@ -1,5 +1,4 @@
 {
-  "private": false,
   "name": "@pbw/core",
   "version": "1.0.0",
   "main": "dist/index.js",
@@ -12,5 +11,8 @@
   },
   "scripts": {
     "build": "tsc"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

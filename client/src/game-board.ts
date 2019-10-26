@@ -37,6 +37,34 @@ export class GameBoard extends EventEmitter {
 
   render() {
     this.setupMouse();
+    this.setupTouch();
+  }
+
+  private setupTouch() {
+    this.canvas.addEventListener("touchstart", event => {
+      this.drawing = true;
+      const [x, y] = this.getEventPosition(event);
+      this.currentX = x;
+      this.currentY = y;
+    });
+
+    this.canvas.addEventListener("touchend", event => {
+      if (!this.drawing) return;
+      this.drawing = false;
+      const [x, y] = this.getEventPosition(event);
+      this.drawLine(this.currentX, this.currentY, x, y);
+    });
+
+    this.canvas.addEventListener(
+      "touchmove",
+      throttle((event: MouseEvent) => {
+        if (!this.drawing) return;
+        const [x, y] = this.getEventPosition(event);
+        this.drawLine(this.currentX, this.currentY, x, y);
+        this.currentX = x;
+        this.currentY = y;
+      }, 10)
+    );
   }
 
   private setupMouse() {
@@ -87,8 +115,10 @@ export class GameBoard extends EventEmitter {
     if (emit) this.emit("setLineWidth", lineWidth);
   }
 
-  private getEventPosition(e: MouseEvent): [number, number] {
+  private getEventPosition(e: MouseEvent | TouchEvent): [number, number] {
     const { left, top } = this.canvas.getBoundingClientRect();
-    return [e.pageX - left, e.pageY - top];
+    const pageX = e instanceof MouseEvent ? e.pageX : e.touches[0].pageX;
+    const pageY = e instanceof MouseEvent ? e.pageY : e.touches[0].pageY;
+    return [pageX - left, pageY - top];
   }
 }

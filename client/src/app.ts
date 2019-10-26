@@ -6,12 +6,15 @@ export class App {
   private appContainer: HTMLElement;
   private client: Client;
   private gameBoard?: GameBoard;
-  private _connected: boolean = false;
+  private _connected = false;
 
   constructor(serverUrl: string) {
     this.appContainer = document.getElementById("app");
     this.client = new Client(serverUrl);
-    this.client.connect().then(() => (this.connected = true));
+    this.client
+      .connect()
+      .then(() => (this.connected = true))
+      .catch(e => console.error("Error connecting to game server", e));
   }
 
   get connected() {
@@ -20,7 +23,6 @@ export class App {
 
   set connected(connected: boolean) {
     this._connected = connected;
-    this.renderBoard();
   }
 
   renderBoard() {
@@ -28,7 +30,7 @@ export class App {
     const board = fetchingNode.querySelector("canvas");
     this.gameBoard = new GameBoard(board);
     this.gameBoard.on("drawLine", (event: { x0; y0; x1; y1 }) => {
-      this.client.drawLine(event);
+      if (this.connected) this.client.drawLine(event);
     });
     this.gameBoard.render();
     this.appContainer.appendChild(board);
@@ -42,5 +44,6 @@ export class App {
       if (username.value) this.client.register(username.value);
     });
     this.appContainer.appendChild(fetchingNode);
+    this.renderBoard();
   }
 }

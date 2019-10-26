@@ -1,6 +1,11 @@
 import WebSocket from "ws";
 import { getMessage } from "@pbw/core";
+import * as Sentry from "@sentry/node";
 
+const dsn = process.env.SENTRY_SDN;
+if (dsn) {
+  Sentry.init({ dsn });
+}
 const wss = new WebSocket.Server({ port: 8080 });
 
 const roomHistory: Buffer[] = [];

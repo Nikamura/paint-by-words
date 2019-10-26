@@ -16,6 +16,7 @@
   "dependencies": {
     "@pbw/core": "^1.0.1",
     "@pbw/messages": "^1.0.1",
+    "@sentry/node": "5.7.1",
     "ws": "^7.1.2"
   },
   "publishConfig": {

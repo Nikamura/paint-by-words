@@ -14,5 +14,19 @@
     </template>
     <div id="app"></div>
     <script src="./index.ts"></script>
+    <script>
+      if (navigator.doNotTrack === "1" || navigator.doNotTrack === "yes") {
+        console.info("NO TRACKING MODE ENABLED!");
+      } else {
+        const scriptTag = document.createElement('script');
+        scriptTag.setAttribute('src','https://browser.sentry-cdn.com/5.7.1/bundle.min.js');
+        scriptTag.setAttribute('integrity','sha384-KMv6bBTABABhv0NI+rVWly6PIRvdippFEgjpKyxUcpEmDWZTkDOiueL5xW+cztZZ');
+        scriptTag.setAttribute('crossorigin','anonymous');
+        scriptTag.onload = () => {
+          Sentry.init({ dsn: process.env.SENTRY_SDN });
+        }
+        document.head.appendChild(scriptTag);
+      }
+    </script>
   </body>
 </html>

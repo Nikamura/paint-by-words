@@ -1,30 +1,73 @@
 <html lang="en">
   <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" type="text/css" href="index.scss" />
   </head>
+
   <body>
+    <main>
+      <div id="app"></div>
+    </main>
+
+    <noscript>
+      Unfortunatly the game does not work without JavaScript. We require
+      JavaScript for establishing a WebSocket connection to our gameserver.
+      <br />
+      If you have JavaScript disabled because of privacy reasons: we respect
+      your browser settings, and if you send doNotTrack we won't load any
+      third-party service scripts.
+    </noscript>
+
+    <template id="chat-template">
+      <div class="chat-box">
+        <div id="messages">
+          <div>James: Message #1</div>
+          <div>Any: Message #2</div>
+        </div>
+        <form>
+          <input type="text" name="message" placeholder="Enter your message" />
+          <input type="submit" value="Send" />
+        </form>
+      </div>
+    </template>
     <template id="login-template">
-      <form>
+      <div class="login-box">
+        <form>
           Welcome, <input placeholder="Enter your name" name="name" />!
-          <input type="submit">Join</input>
-      </form>
+          <input type="submit" value="Join" />
+        </form>
+      </div>
     </template>
-    <template id="game-board">
-      <canvas width="600" height="400" style="border: 1px solid red;"></canvas>
+    <template id="game-board-template">
+      <div class="game-board-box">
+        <canvas
+          width="600"
+          height="400"
+          style="border: 1px solid red;"
+        ></canvas>
+      </div>
     </template>
-    <div id="app"></div>
+
     <script src="./index.ts"></script>
+
     <script>
       if (navigator.doNotTrack === "1" || navigator.doNotTrack === "yes") {
         console.info("NO TRACKING MODE ENABLED!");
       } else {
-        const scriptTag = document.createElement('script');
-        scriptTag.setAttribute('src','https://browser.sentry-cdn.com/5.7.1/bundle.min.js');
-        scriptTag.setAttribute('integrity','sha384-KMv6bBTABABhv0NI+rVWly6PIRvdippFEgjpKyxUcpEmDWZTkDOiueL5xW+cztZZ');
-        scriptTag.setAttribute('crossorigin','anonymous');
+        const scriptTag = document.createElement("script");
+        scriptTag.setAttribute(
+          "src",
+          "https://browser.sentry-cdn.com/5.7.1/bundle.min.js"
+        );
+        scriptTag.setAttribute(
+          "integrity",
+          "sha384-KMv6bBTABABhv0NI+rVWly6PIRvdippFEgjpKyxUcpEmDWZTkDOiueL5xW+cztZZ"
+        );
+        scriptTag.setAttribute("crossorigin", "anonymous");
         scriptTag.onload = () => {
           Sentry.init({ dsn: process.env.SENTRY_SDN });
-        }
+        };
         document.head.appendChild(scriptTag);
       }
     </script>

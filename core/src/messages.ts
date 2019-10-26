@@ -19,5 +19,16 @@ export function getMessage(data: Buffer): MessageType | void {
     return;
   }
 
-  return (<any>messageClass).deserializeBinary(message.getPayload_asU8());
+  return (messageClass as any).deserializeBinary(message.getPayload_asU8());
+}
+
+export function createMessage(payload: MessageType): Message {
+  const type = Array.from(messageMap.entries()).find(
+    ([, klass]) => payload instanceof klass
+  );
+  if (!type) throw new Error("Unidentitifed message type");
+  const message = new Message();
+  message.setMessagetype(type[0]);
+  message.setPayload(payload.serializeBinary());
+  return message;
 }

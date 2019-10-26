@@ -1,1 +1,1 @@
-export { getMessage } from "./src/messages";
+export { getMessage, createMessage } from "./src/messages";

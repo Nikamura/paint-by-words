@@ -1,8 +1,9 @@
 import { Register, Message, DrawLine } from "@pbw/messages";
+import { createMessage } from "@pbw/core";
 
 export default class Client {
   private serverUrl: string;
-  private connection: WebSocket;
+  public connection: WebSocket;
 
   constructor(serverUrl: string) {
     this.serverUrl = serverUrl;
@@ -28,15 +29,13 @@ export default class Client {
     x1: number;
     y1: number;
   }) {
-    const registerMessage = new DrawLine();
-    registerMessage.setX0(x0);
-    registerMessage.setY0(y0);
-    registerMessage.setX1(x1);
-    registerMessage.setY1(y1);
-    const message = new Message();
-    message.setMessagetype(1);
-    message.setPayload(registerMessage.serializeBinary());
-    this.connection.send(message.serializeBinary());
+    const drawLineMessage = new DrawLine();
+    drawLineMessage.setX0(x0);
+    drawLineMessage.setY0(y0);
+    drawLineMessage.setX1(x1);
+    drawLineMessage.setY1(y1);
+    const message = createMessage(drawLineMessage).serializeBinary();
+    this.connection.send(message);
   }
 
   public async connect(): Promise<WebSocket> {

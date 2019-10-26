@@ -42,6 +42,7 @@ export class GameBoard extends EventEmitter {
 
   private setupTouch() {
     this.canvas.addEventListener("touchstart", event => {
+      event.preventDefault();
       this.drawing = true;
       const [x, y] = this.getEventPosition(event);
       this.currentX = x;
@@ -49,6 +50,7 @@ export class GameBoard extends EventEmitter {
     });
 
     this.canvas.addEventListener("touchend", event => {
+      event.preventDefault();
       if (!this.drawing) return;
       this.drawing = false;
       const [x, y] = this.getEventPosition(event);
@@ -58,6 +60,7 @@ export class GameBoard extends EventEmitter {
     this.canvas.addEventListener(
       "touchmove",
       throttle((event: MouseEvent) => {
+        event.preventDefault();
         if (!this.drawing) return;
         const [x, y] = this.getEventPosition(event);
         this.drawLine(this.currentX, this.currentY, x, y);
@@ -69,6 +72,7 @@ export class GameBoard extends EventEmitter {
 
   private setupMouse() {
     this.canvas.addEventListener("mousedown", event => {
+      event.preventDefault();
       this.drawing = true;
       const [x, y] = this.getEventPosition(event);
       this.currentX = x;
@@ -76,6 +80,7 @@ export class GameBoard extends EventEmitter {
     });
 
     this.canvas.addEventListener("mouseup", event => {
+      event.preventDefault();
       if (!this.drawing) return;
       this.drawing = false;
       const [x, y] = this.getEventPosition(event);
@@ -85,6 +90,7 @@ export class GameBoard extends EventEmitter {
     this.canvas.addEventListener(
       "mousemove",
       throttle((event: MouseEvent) => {
+        event.preventDefault();
         if (!this.drawing) return;
         const [x, y] = this.getEventPosition(event);
         this.drawLine(this.currentX, this.currentY, x, y);

@@ -1,7 +1,12 @@
 load("//tools:parcel.bzl", "parcel")
 
+package(default_visibility = ["//visibility:public"])
+
 parcel(
     name = "client",
-    srcs = glob(["src/**/*"]),
+    srcs = glob([
+        "src/**/*",
+        "node_modules/**/*",
+    ]),
     entry_point = ":src/index.html",
 )

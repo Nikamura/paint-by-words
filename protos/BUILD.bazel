@@ -1,20 +1,19 @@
-package(default_visibility = ["//visibility:public"])
-
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
+load("//tools/npm:package.bzl", "dataform_npm_package")
+
+package(default_visibility = ["//visibility:public"])
 
 ts_library(
     name = "protos",
     srcs = glob(["**/*.ts"]),
     module_name = "@pbw/messages",
     deps = [
-        "@npm//google-protobuf",
         "@npm//@types/google-protobuf",
+        "@npm//@types/node",
+        "@npm//google-protobuf",
         "@npm//ts-protoc-gen",
-        "@npm//@types/node"
     ],
 )
-
-load("//tools/npm:package.bzl", "dataform_npm_package")
 
 dataform_npm_package(
     name = "package",

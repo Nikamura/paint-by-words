@@ -28,8 +28,7 @@ def _parcel_impl(ctx):
 
     # Options documented at https://parceljs.org/cli.html
     args = ["build", ctx.file.entry_point.short_path]
-    args += ["--out-dir", ctx.outputs.bundle.dirname]
-    args += ["--no-cache"]
+    args += ["--out-dir", ctx.outputs.bundle.path]
     # args += ["--out-file", ctx.outputs.bundle.basename]
 
     ctx.actions.run(
@@ -57,6 +56,6 @@ parcel = rule(
         ),
     },
     outputs = {
-        "bundle": "index.html",
+        "bundle": "bundle",
     },
 )

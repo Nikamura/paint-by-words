@@ -1,6 +1,7 @@
-package(default_visibility = ["//visibility:public"])
-
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
+load("//tools/npm:package.bzl", "dataform_npm_package")
+
+package(default_visibility = ["//visibility:public"])
 
 ts_library(
     name = "core",
@@ -8,11 +9,9 @@ ts_library(
     module_name = "@pbw/core",
     deps = [
         "//protos",
-        "@npm//@types/node"
+        "@npm//@types/node",
     ],
 )
-
-load("//tools/npm:package.bzl", "dataform_npm_package")
 
 dataform_npm_package(
     name = "package",

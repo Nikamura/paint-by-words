@@ -1,0 +1,9 @@
+{
+  "name": "@pbw/core",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "dependencies": {
+    "@pbw/messages": "$DF_VERSION",
+    "@types/node": "^12.11.7"
+  }
+}

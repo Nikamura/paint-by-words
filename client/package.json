@@ -10,13 +10,9 @@
   "dependencies": {
     "@pbw/core": "^1.0.1",
     "@pbw/messages": "^1.0.1",
-    "normalize.css": "^8.0.1"
-  },
-  "devDependencies": {
+    "normalize.css": "^8.0.1",
     "@types/node": "^12.11.7",
-    "parcel-bundler": "^1.12.4",
-    "sass": "^1.23.1",
-    "typescript": "^3.7.1-rc"
+    "parcel-bundler": "^1.12.4"
   },
   "browserslist": [
     "> 1%",

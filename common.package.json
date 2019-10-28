@@ -1,0 +1,9 @@
+{
+  "version": "$DF_VERSION",
+  "homepage": "http://github.com/nikamura/paint-by-words",
+  "license": "MIT",
+  "keywords": [],
+  "publishConfig": {
+    "access": "public"
+  }
+}

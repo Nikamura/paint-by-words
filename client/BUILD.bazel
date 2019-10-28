@@ -1,0 +1,7 @@
+load("//tools:parcel.bzl", "parcel")
+
+parcel(
+    name = "client",
+    srcs = glob(["src/**/*"]),
+    entry_point = ":src/index.html",
+)

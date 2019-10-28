@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "./",
     "rootDir": "./",
-    "declaration": true
+    "declaration": true,
+    "lib": ["esnext"]
   },
   "exclude": ["node_modules"]
 }

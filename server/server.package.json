@@ -1,25 +1,17 @@
 {
   "name": "@pbw/server",
-  "version": "1.0.1",
   "main": "dist/index.js",
-  "license": "MIT",
   "scripts": {
     "build": "tsc",
     "dev": "tsc-watch --onSuccess \"node ./dist/index.js\""
   },
-  "devDependencies": {
-    "@types/ws": "^6.0.3",
-    "lerna": "^3.18.3",
-    "tsc-watch": "^4.0.0",
-    "typescript": "^3.7.1-rc"
-  },
   "dependencies": {
+    "@types/ws": "^6.0.3",
+    "tsc-watch": "^4.0.0",
     "@pbw/core": "^1.0.1",
     "@pbw/messages": "^1.0.1",
+    "@types/node": "^12.11.7",
     "@sentry/node": "5.7.1",
     "ws": "^7.1.2"
-  },
-  "publishConfig": {
-    "access": "public"
   }
 }
